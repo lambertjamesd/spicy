@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var ldArgs = []string{"-G 0", "-nostartfiles", "-nodefaultlibs", "-nostdinc", "-M"}
@@ -70,7 +71,7 @@ SECTIONS {
       {{end}}
       . = ALIGN(0x10);
       _{{.Name}}SegmentDataEnd = .;
-    } > ram
+    } {{if (gt .Positioning.Address 0x80000400)}} > ram {{end}}
     _RomSize += (_{{.Name}}SegmentDataEnd - _{{.Name}}SegmentTextStart);
     _{{.Name}}SegmentRomEnd = _RomSize;
 
@@ -93,7 +94,7 @@ SECTIONS {
       . = ALIGN(0x10);
       _{{.Name}}SegmentBssEnd = .;
       _{{.Name}}SegmentEnd = .;
-    } > ram.bss
+    } {{if (gt .Positioning.Address 0x80000400)}} > ram.bss {{end}}
     _{{.Name}}SegmentBssSize =  _{{.Name}}SegmentBssEnd - _{{.Name}}SegmentBssStart;
   {{ end }}
   {{range .RawSegments -}}
