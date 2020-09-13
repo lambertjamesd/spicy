@@ -53,13 +53,22 @@ SECTIONS {
     : AT(_RomSize)
     {
       _{{.Name}}SegmentStart = .;
-      . = ALIGN(0x10);
+      {{if not (eq .Align 0)}}
+        . = ALIGN({{.Align}});
+      {{else}}
+        . = ALIGN(0x10);
+      {{end}}
       _{{.Name}}SegmentTextStart = .;
       {{range .Includes -}}
         {{.}} (.text)
       {{end}}
       _{{.Name}}SegmentTextEnd = .;
       _{{.Name}}SegmentDataStart = .;
+      {{if not (eq .Align 0)}}
+        . = ALIGN({{.Align}});
+      {{else}}
+        . = ALIGN(0x10);
+      {{end}}
       {{range .Includes -}}
         {{.}} (.data)
       {{end}}
